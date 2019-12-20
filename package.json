@@ -1,0 +1,22 @@
+{
+  "name": "dalichain-tx-constructor-web",
+  "version": "1.0.0",
+  "description": "web of dalichain transaction constructor",
+  "main": "app.js",
+  "dependencies": {
+    "express": "4.17.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lemengbin/dalichain-tx-constructor-web.git"
+  },
+  "author": "lemengbin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lemengbin/dalichain-tx-constructor-web/issues"
+  },
+  "homepage": "https://github.com/lemengbin/dalichain-tx-constructor-web#readme"
+}
