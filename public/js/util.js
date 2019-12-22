@@ -1,8 +1,7 @@
 function GetSymbol(category){
     var symbol = $axure("@" + category + "_symbol_input").text();
-    if(symbol == "交易的币种")
-    {
-        alert("symbol不能为空, 请输入对应的内容");
+    if(symbol == "交易的币种"){
+        Alert(category, "symbol不能为空，请输入对应的内容");
         return;
     }
     return symbol;
@@ -30,27 +29,27 @@ function GetVin(category, withPrivkey){
 
         if(txin["txid"] == "交易ID")
         {
-            alert("第" + (i+1) + "个输入中的txid不能为空，请输入对应的内容");
+            Alert(category, "第" + (i+1) + "个输入中的txid不能为空，请输入对应的内容");
             return;
         }
         if(txin["outtype"] == "交易输出类型")
         {
-            alert("第" + (i+1) + "个输入中的outtype不能为空，请输入对应的内容");
+            Alert(category, "第" + (i+1) + "个输入中的outtype不能为空，请输入对应的内容");
             return;
         }
         if(txin["vout"] == "交易输出序号")
         {
-            alert("第" + (i+1) + "个输入中的vout不能为空，请输入对应的内容");
+            Alert(category, "第" + (i+1) + "个输入中的vout不能为空，请输入对应的内容");
             return;
         }
         if(txin["scriptPubKey"] == "公钥脚本")
         {
-            alert("第" + (i+1) + "个输入中的scriptPubKey不能为空，请输入对应的内容");
+            Alert(category, "第" + (i+1) + "个输入中的scriptPubKey不能为空，请输入对应的内容");
             return;
         }
         if(withPrivkey && txin["privkey"] == "私钥")
         {
-            alert("第" + (i+1) + "个输入中的privkey不能为空，请输入对应的内容");
+            Alert(category, "第" + (i+1) + "个输入中的privkey不能为空，请输入对应的内容");
             return;
         }
 
@@ -72,12 +71,16 @@ function GetVout(category){
 
         if(address == "目标地址")
         {
-            alert("第" + (i+1) + "个输出中的address不能为空，请输入对应的内容");
+            Alert(category, "第" + (i+1) + "个输出中的address不能为空，请输入对应的内容");
             return;
         }
         if(amount == "数量")
         {
-            alert("第" + (i+1) + "个输出中的amount不能为空，请输入对应的内容");
+            Alert(category, "第" + (i+1) + "个输出中的amount不能为空，请输入对应的内容");
+            return;
+        }
+        if(vout[address]){
+            Alert(category, "第" + (i+1) + "个输出中的address已存在，请检查是否正确");
             return;
         }
 
@@ -91,7 +94,7 @@ function GetGasSymbol(category){
     var symbol = $axure("@" + category + "_gas_symbol_input").text();
     if(symbol == "交易的币种")
     {
-        alert("gas_symbol不能为空, 请输入对应的内容");
+        Alert(category, "gas_symbol不能为空，请输入对应的内容");
         return;
     }
     return symbol;
@@ -119,27 +122,27 @@ function GetGasVin(category, withPrivkey){
 
         if(txin["txid"] == "交易ID")
         {
-            alert("GasToken: 第" + (i+1) + "个输入中的txid不能为空，请输入对应的内容");
+            Alert(category, "GasToken: 第" + (i+1) + "个输入中的txid不能为空，请输入对应的内容");
             return;
         }
         if(txin["outtype"] == "交易输出类型")
         {
-            alert("GasToken: 第" + (i+1) + "个输入中的outtype不能为空，请输入对应的内容");
+            Alert(category, "GasToken: 第" + (i+1) + "个输入中的outtype不能为空，请输入对应的内容");
             return;
         }
         if(txin["vout"] == "交易输出序号")
         {
-            alert("GasToken: 第" + (i+1) + "个输入中的vout不能为空，请输入对应的内容");
+            Alert(category, "GasToken: 第" + (i+1) + "个输入中的vout不能为空，请输入对应的内容");
             return;
         }
         if(txin["scriptPubKey"] == "公钥脚本")
         {
-            alert("GasToken: 第" + (i+1) + "个输入中的scriptPubKey不能为空，请输入对应的内容");
+            Alert(category, "GasToken: 第" + (i+1) + "个输入中的scriptPubKey不能为空，请输入对应的内容");
             return;
         }
         if(withPrivkey && txin["privkey"] == "私钥")
         {
-            alert("GasToken: 第" + (i+1) + "个输入中的privkey不能为空，请输入对应的内容");
+            Alert(category, "GasToken: 第" + (i+1) + "个输入中的privkey不能为空，请输入对应的内容");
             return;
         }
 
@@ -161,12 +164,16 @@ function GetGasVout(category){
 
         if(address == "目标地址")
         {
-            alert("GasToken: 第" + (i+1) + "个输出中的address不能为空，请输入对应的内容");
+            Alert(category, "GasToken: 第" + (i+1) + "个输出中的address不能为空，请输入对应的内容");
             return;
         }
         if(amount == "数量")
         {
-            alert("GasToken: 第" + (i+1) + "个输出中的amount不能为空，请输入对应的内容");
+            Alert(category, "GasToken: 第" + (i+1) + "个输出中的amount不能为空，请输入对应的内容");
+            return;
+        }
+        if(vout[address]){
+            Alert(category, "GasToken: 第" + (i+1) + "个输出中的address已存在，请检查是否正确");
             return;
         }
 
@@ -174,4 +181,61 @@ function GetGasVout(category){
     };
 
     return vout;
+}
+
+function BuildParams(category){
+    var json = {};
+
+    if(category != "publish")
+    {
+        if(!(json["symbol"] = GetSymbol(category)))
+            return;
+
+        if(!(json["vin"] = GetVin(category, category != "multisig")))
+            return;
+
+        if(!(json["vout"] = GetVout(category)))
+            return;
+    }
+
+    if(category == "publish" || $axure("@" + category + "_config_gasToken").checked()){
+        if(!(json["gas_symbol"] = GetGasSymbol(category)))
+            return;
+
+        if(!(json["gas_vin"] = GetGasVin(category, category != "multisig")))
+            return;
+
+        if(!(json["gas_vout"] = GetGasVout(category)))
+            return;
+    }
+
+    return json;
+}
+
+function Alert(category, msg){
+    if(category == "sender")
+        alert("发送者的" + msg);
+    else if(category == "receiver")
+        alert("接收者的" + msg);
+    else
+        alert(msg);
+}
+
+function FormatNumber(num){
+    var arrNum = num.split('.');
+    if(arrNum.length < 2){
+        arrNum[1] = "00000000";
+        return arrNum.join('.');
+    }
+
+    if((arrNum[0] > 0) && arrNum[1].length < 8)
+        arrNum[1] = Math.pow(10, 8-arrNum[1].length) * arrNum[1];
+
+    return arrNum.join('.');
+}
+
+function SortObjectKeys(obj){
+    var tmp = {};
+    Object.keys(obj).sort().forEach(function(k){tmp[k]=obj[k]});
+    return tmp;
 }
