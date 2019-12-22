@@ -151,8 +151,12 @@ $(document).ready(function(){
     $axure("@next_button").click(function(){
         // sender utxo
         send_utxo = BuildParams("sender");
-        if(!send_utxo)
+        if(!send_utxo){
+            $axure("@Tab_Content").SetPanelState(1, {}, false);
+            $axure("@tab_sender").selected(true);
+            $axure("@tab_sender").bringToFront();
             return;
+        }
 
         console.log(JSON.stringify(send_utxo));
     })
