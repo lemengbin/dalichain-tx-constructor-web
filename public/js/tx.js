@@ -73,6 +73,8 @@ $(document).ready(function(){
     $axure("@create_publish_tx").click(function(){
         var category = "publish";
 
+        var token_params_input_id = $axure("@token_params_input").getElementIds()[0] + "_input";
+
         // publish params
         var tokenParams = {};
         var reservePrivkey = $axure("@reservePrivkey_input").text();
@@ -80,6 +82,7 @@ $(document).ready(function(){
         var tokenName = $axure("@tokenName_input").text();
         if(tokenName == "Token名称")
         {
+            $('#' + token_params_input_id).val('Token参数信息');
             alert("tokenName不能为空，请输入对应的内容");
             return;
         }
@@ -88,6 +91,7 @@ $(document).ready(function(){
         var number = $axure("@number_input").text();
         if(number == "Token数量")
         {
+            $('#' + token_params_input_id).val('Token参数信息');
             alert("number不能为空，请输入对应的内容");
             return;
         }
@@ -96,6 +100,7 @@ $(document).ready(function(){
         var maximum = $axure("@maximum_input").text();
         if(maximum == "Token最大数量，-1表示100亿的上限")
         {
+            $('#' + token_params_input_id).val('Token参数信息');
             alert("maximum不能为空，请输入对应的内容");
             return;
         }
@@ -104,6 +109,7 @@ $(document).ready(function(){
         var address = $axure("@address_input").text();
         if(address == "Token发行者的地址")
         {
+            $('#' + token_params_input_id).val('Token参数信息');
             alert("address不能为空，请输入对应的内容");
             return;
         }
@@ -112,6 +118,7 @@ $(document).ready(function(){
         var compName = $axure("@compName_input").text();
         if(compName == "Token所属组织的名称")
         {
+            $('#' + token_params_input_id).val('Token参数信息');
             alert("compName不能为空，请输入对应的内容");
             return;
         }
@@ -120,6 +127,7 @@ $(document).ready(function(){
         var compID = $axure("@compID_input").text();
         if(compID == "Token所属组织的编号")
         {
+            $('#' + token_params_input_id).val('Token参数信息');
             alert("compID不能为空，请输入对应的内容");
             return;
         }
@@ -137,6 +145,8 @@ $(document).ready(function(){
         sortObj["sign"] = sigHex;
 
         var token_params = base58.encode(Buffer.from(JSON.stringify(sortObj)));
+
+        $('#' + token_params_input_id).val(token_params);
 
         var json = BuildParams(category);
         if(!json)
