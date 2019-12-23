@@ -12,7 +12,7 @@ $(document).ready(function(){
         if(port == "远程节点连接端口（非RPC端口）")
             port = 9333;
 
-        console.log("remote node: " + ip + ":" + port);
+        //console.log("remote node: " + ip + ":" + port);
     })
 
     // 普通交易
@@ -22,7 +22,10 @@ $(document).ready(function(){
         var json = BuildParams(category);
         if(!json)
             return;
-        console.log(JSON.stringify(json));
+
+        var strJson = JsonToString(json);
+        //console.log(strJson);
+        ExecuteCmd(category, strJson);
     })
 
     // 多签交易
@@ -37,7 +40,7 @@ $(document).ready(function(){
             alert("nRequired不能为空，请输入对应的内容");
             return;
         }
-        multisigParams["nRequired"] = nRequired;
+        multisigParams["nrequired"] = parseInt(nRequired);
 
         var redeemScript = $axure("@multisig_redeemScript_input").text();
         if(redeemScript == "赎回脚本")
@@ -66,7 +69,10 @@ $(document).ready(function(){
             return;
 
         json["multisig_params"] = multisigParams;
-        console.log(JSON.stringify(json));
+
+        var strJson = JsonToString(json);
+        //console.log(strJson);
+        ExecuteCmd(category, strJson);
     })
 
     // Token发布交易
@@ -153,39 +159,45 @@ $(document).ready(function(){
             return;
 
         json["token_params"] = token_params;
-        console.log(JSON.stringify(json));
+
+        var strJson = JsonToString(json);
+        //console.log(strJson);
+        ExecuteCmd(category, strJson);
     })
 
     // 币币互换交易
-    var send_utxo = {};
+    var strSendJson = "";
     $axure("@next_button").click(function(){
-        // sender utxo
-        send_utxo = BuildParams("sender");
-        if(!send_utxo){
+        var json = BuildParams("sender");
+        if(!json){
             $axure("@Tab_Content").SetPanelState(1, {}, false);
             $axure("@tab_sender").selected(true);
             $axure("@tab_sender").bringToFront();
             return;
         }
 
-        console.log(JSON.stringify(send_utxo));
+        strSendJson = JsonToString(json);
+        //console.log(strSendJson);
     })
     $axure("@create_exchange_tx").click(function(){
-        var json = {};
+        var strJson = "{";
 
-        if($.isEmptyObject(send_utxo)){
+        if(strSendJson == ""){
             alert("请先配置发送方相关数据");
             return;
         }
-        json["send_utxo"] = send_utxo;
+        strJson += ('"send_utxo":' + strSendJson);
 
         // receiver utxo
-        var recv_utxo = BuildParams("receiver");
-        if(!recv_utxo)
+        var recvJson = BuildParams("receiver");
+        if(!recvJson)
             return;
-        json["recv_utxo"] = recv_utxo;
+        strJson += (',"recv_utxo":' + JsonToString(recvJson));
 
-        console.log(JSON.stringify(json));
+        strJson += "}";
+
+        //console.log(strJson);
+        ExecuteCmd("exchange", strJson);
     })
 
     // 创建合约
@@ -225,7 +237,7 @@ $(document).ready(function(){
         contractRequest["params"] = {};
 
         var contractInfo = {};
-        contractInfo["base58Type"] = base58Type;
+        contractInfo["base58Type"] = parseInt(base58Type);
         contractInfo["owner_privkey"] = ownerPrivkey;
         contractInfo["sourceType"] = sourceType;
         contractInfo["code"] = code;
@@ -233,14 +245,16 @@ $(document).ready(function(){
         var contractParams = [];
         contractParams[0] = contractRequest;
         contractParams[1] = contractInfo;
-        console.log(JSON.stringify(contractParams));
 
         var json = BuildParams(category);
         if(!json)
             return;
 
         json["contract_params"] = contractParams;
-        console.log(JSON.stringify(json));
+
+        var strJson = JsonToString(json);
+        //console.log(strJson);
+        ExecuteCmd("contract", strJson);
     })
 
     // 调用合约
@@ -270,7 +284,7 @@ $(document).ready(function(){
         var param_arr = $axure("@param_input").getElements();
         for(var i = 0; i < param_arr.length; i++){
             var param = param_arr[i].children[1].value;
-            if(param == "调用参数（采用Key-Value的方式，比如：\“a\":123    \"b\":\"hello world\"）"){
+            if(param == "调用参数（采用Key-Value的方式，比如：a:123    b:\"hello world\"）"){
                 alert("第" + (i+1) + "个param不能为空，请输入对应的内容");
                 return;
             }
@@ -282,10 +296,10 @@ $(document).ready(function(){
         }
 
         var contractRequest = {};
-        contractParams["address"] = address;
-        contractParams["feeBackAddr"] = feeBackAddr;
-        contractParams["function"] = functionName;
-        contractParams["params"] = params;
+        contractRequest["address"] = address;
+        contractRequest["feeBackAddr"] = feeBackAddr;
+        contractRequest["function"] = functionName;
+        contractRequest["params"] = params;
 
         var contractParams = [];
         contractParams[0] = contractRequest;
@@ -295,6 +309,58 @@ $(document).ready(function(){
             return;
 
         json["contact_params"] = contractParams;
-        console.log(JSON.stringify(json));
+
+        var strJson = JsonToString(json);
+        //console.log(strJson);
+        ExecuteCmd("contract", strJson);
     })
+
+    function ExecuteCmd(category, strJson){
+        var txType = 0;
+        switch(category){
+            case "common":
+                txType = 1;
+                break;
+            case "multisig":
+                txType = 2;
+                break;
+            case "publish":
+                txType = 3;
+                break;
+            case "exchange":
+                txType = 4;
+                break;
+            case "contract":
+                txType = 5;
+                break;
+            default:
+                alert("Unknow transaction type");
+                return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/exec",
+            data: {
+                ip: ip,
+                port: port,
+                txType: txType,
+                txParam: strJson
+            },
+            success: function(data){
+                var ret = JSON.parse(data);
+                if(ret["stderr"] != ""){
+                    alert("构建交易失败，情况如下：\n" + ret["stderr"]);
+                }else{
+                    if(ret["stdout"].toUpperCase().indexOf("ERROR:") != -1){
+                        alert("构建或发送交易失败，情况如下：\n" + ret["stdout"]);
+                    }else{
+                        alert("构建和发送交易成功，情况如下：\n" + ret["stdout"]);
+                    }
+                }
+            },
+            error: function(){
+            }
+        })
+    }
 })

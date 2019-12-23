@@ -1,4 +1,5 @@
 function GetSymbol(category){
+    //var symbol = $axure("@" + category + "_symbol_input").text().toUpperCase();
     var symbol = $axure("@" + category + "_symbol_input").text();
     if(symbol == "交易的币种"){
         Alert(category, "symbol不能为空，请输入对应的内容");
@@ -53,6 +54,8 @@ function GetVin(category, withPrivkey){
             return;
         }
 
+        txin["outtype"] = parseInt(txin["outtype"]);
+        txin["vout"] = parseInt(txin["vout"]);
         vin[i] = txin;
     };
 
@@ -79,18 +82,24 @@ function GetVout(category){
             Alert(category, "第" + (i+1) + "个输出中的amount不能为空，请输入对应的内容");
             return;
         }
+        /*
         if(vout[address]){
             Alert(category, "第" + (i+1) + "个输出中的address已存在，请检查是否正确");
             return;
         }
-
         vout[address] = amount;
+        */
+
+        if(!vout[address])
+            vout[address] = [];
+        vout[address].push(amount);
     };
 
     return vout;
 }
 
 function GetGasSymbol(category){
+    //var symbol = $axure("@" + category + "_gas_symbol_input").text().toUpperCase();
     var symbol = $axure("@" + category + "_gas_symbol_input").text();
     if(symbol == "交易的币种")
     {
@@ -146,6 +155,8 @@ function GetGasVin(category, withPrivkey){
             return;
         }
 
+        txin["outtype"] = parseInt(txin["outtype"]);
+        txin["vout"] = parseInt(txin["vout"]);
         vin[i] = txin;
     };
 
@@ -172,12 +183,16 @@ function GetGasVout(category){
             Alert(category, "GasToken: 第" + (i+1) + "个输出中的amount不能为空，请输入对应的内容");
             return;
         }
+        /*
         if(vout[address]){
             Alert(category, "GasToken: 第" + (i+1) + "个输出中的address已存在，请检查是否正确");
             return;
         }
-
         vout[address] = amount;
+        */
+        if(!vout[address])
+            vout[address] = [];
+        vout[address].push(amount);
     };
 
     return vout;
@@ -238,4 +253,37 @@ function SortObjectKeys(obj){
     var tmp = {};
     Object.keys(obj).sort().forEach(function(k){tmp[k]=obj[k]});
     return tmp;
+}
+
+function JsonToString(json){
+    var strJson = "{";
+
+    // handle vout and gasvout
+    for(var key in json){
+        if(key != "vout" && key != "gas_vout"){
+            strJson += JSON.stringify(key);
+            strJson += ":";
+            strJson += JSON.stringify(json[key]);
+            strJson += ",";
+        }else{
+            var tempJson = json[key];
+            var strTempJson = JSON.stringify(key) + ":{";
+            for(var address in tempJson){
+                for(var i = 0; i < tempJson[address].length; i++){
+                    strTempJson += JSON.stringify(address);
+                    strTempJson += ":";
+                    strTempJson += JSON.stringify(tempJson[address][i]);
+                    strTempJson += ",";
+                }
+            }
+            strTempJson = strTempJson.substring(0, strTempJson.length - 1);
+            strTempJson += "},";
+            strJson += strTempJson;
+        }
+    }
+
+    strJson = strJson.substring(0, strJson.length - 1);
+    strJson += "}";
+
+    return strJson;
 }
