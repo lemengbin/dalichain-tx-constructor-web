@@ -254,7 +254,7 @@ $(document).ready(function(){
 
         var strJson = JsonToString(json);
         //console.log(strJson);
-        ExecuteCmd("contract", strJson);
+        ExecuteCmd(category, strJson);
     })
 
     // 调用合约
@@ -312,7 +312,7 @@ $(document).ready(function(){
 
         var strJson = JsonToString(json);
         //console.log(strJson);
-        ExecuteCmd("contract", strJson);
+        ExecuteCmd(category, strJson);
     })
 
     function ExecuteCmd(category, strJson){
@@ -330,7 +330,8 @@ $(document).ready(function(){
             case "exchange":
                 txType = 4;
                 break;
-            case "contract":
+            case "create": // create contract
+            case "call": // call contract
                 txType = 5;
                 break;
             default:
@@ -349,14 +350,11 @@ $(document).ready(function(){
             },
             success: function(data){
                 var ret = JSON.parse(data);
+                var result_content_input = $axure("@" + category + "_result_content").getElementIds()[0] + "_input";
                 if(ret["stderr"] != ""){
-                    alert("构建交易失败，情况如下：\n" + ret["stderr"]);
+                    $('#' + result_content_input).val(ret["stderr"]);
                 }else{
-                    if(ret["stdout"].toUpperCase().indexOf("ERROR:") != -1){
-                        alert("构建或发送交易失败，情况如下：\n" + ret["stdout"]);
-                    }else{
-                        alert("构建和发送交易成功，情况如下：\n" + ret["stdout"]);
-                    }
+                    $('#' + result_content_input).val(ret["stdout"]);
                 }
             },
             error: function(){
