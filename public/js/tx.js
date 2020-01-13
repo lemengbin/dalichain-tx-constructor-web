@@ -285,6 +285,9 @@ $(document).ready(function(){
         for(var i = 0; i < param_arr.length; i++){
             var param = param_arr[i].children[1].value;
             if(param == "调用参数（采用Key-Value的方式，比如：a:123    b:\"hello world\"）"){
+                if(param_arr.length == 1){
+                    break;
+                }
                 alert("第" + (i+1) + "个param不能为空，请输入对应的内容");
                 return;
             }
@@ -308,7 +311,7 @@ $(document).ready(function(){
         if(!json)
             return;
 
-        json["contact_params"] = contractParams;
+        json["contract_params"] = contractParams;
 
         var strJson = JsonToString(json);
         //console.log(strJson);
